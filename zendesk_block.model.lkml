@@ -1,4 +1,4 @@
-connection: "fivetran_looker_blocks_demo"
+connection: "convow_dw"
 
 include: "*_zendesk_block.view"
 include: "*_zendesk_variables.view"
