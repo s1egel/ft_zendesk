@@ -673,7 +673,7 @@
   - name: Ticket Created
     title: Ticket Created
     type: field_filter
-    default_value: '2016'
+    default_value: '2018'
     allow_multiple_values: true
     required: false
     model: zendesk_block
@@ -1378,7 +1378,7 @@
   - name: Ticket Created
     title: Ticket Created
     type: field_filter
-    default_value: '2016'
+    default_value: '2018'
     allow_multiple_values: true
     required: false
     model: zendesk_block

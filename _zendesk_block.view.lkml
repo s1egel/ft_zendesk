@@ -176,22 +176,22 @@ view: ticket {
 
   dimension: days_to_solve {
     type: number
-    sql: 1.00 * DATE_DIFF(${ticket_history_facts.solved_date}, ${created_date}, DAY) ;;
+    sql: 1.00 * DATE_DIFF('DAY', ${created_date}, ${ticket_history_facts.solved_date}) ;;
   }
 
   dimension: days_to_first_response {
     type: number
-    sql: 1.00 * DATE_DIFF(${ticket_history_facts.first_response_date}, ${created_date}, DAY) ;;
+    sql: 1.00 * DATE_DIFF('DAY', ${created_date}, ${ticket_history_facts.first_response_date}) ;;
   }
 
   dimension: minutes_to_first_response {
     type: number
-    sql: 1.00 * DATETIME_DIFF(EXTRACT(DATETIME FROM ${ticket_history_facts.first_response_raw}), EXTRACT(DATETIME FROM ${created_raw}), MINUTE) ;;
+    sql: 1.00 * DATE_DIFF('MINUTE', ${created_raw}, ${ticket_history_facts.first_response_raw}) ;;
   }
 
   dimension: hours_to_solve {
     type: number
-    sql: 1.00 * DATETIME_DIFF(${ticket_history_facts.solved_raw}, ${created_raw}, HOUR) ;;
+    sql: 1.00 * DATE_DIFF('HOUR', ${created_raw}, ${ticket_history_facts.solved_raw}) ;;
   }
 
   dimension: is_responded_to {
@@ -201,7 +201,7 @@ view: ticket {
 
   dimension: days_since_updated {
     type: number
-    sql: 1.00 * DATE_DIFF(${_CURRENT_DATE}, ${last_updated_date}, DAY)  ;;
+    sql: 1.00 * DATE_DIFF('DAY',${last_updated_date}, CURRENT_DATE)  ;;
     html: {% if value > 60 %}
             <div style="color: white; background-color: darkred; font-size:100%; text-align:center">{{ rendered_value }}</div>
           {% else %}
@@ -830,7 +830,7 @@ view: ticket_history_facts {
   derived_table: {
     sql: SELECT
           tfh.ticket_id
-          ,IFNULL(tc.created, MAX(case when field_name = 'status' and value = 'solved' then updated else null end)) as first_response
+          ,COALESCE(tc.created, MAX(case when field_name = 'status' and value = 'solved' then updated else null end)) as first_response
           ,MAX(case when field_name = 'status' then updated else null end) AS last_updated_status
           ,MAX(case when field_name = 'assignee_id' then updated else null end) AS last_updated_by_assignee
           ,MAX(case when field_name = 'requester_id' then updated else null end) AS last_updated_by_requester
@@ -843,10 +843,10 @@ view: ticket_history_facts {
 
       FROM zendesk.ticket_field_history as tfh
       LEFT JOIN (
-          SELECT ticket_id, created, row_number() over (partition by ticket_id order by created asc) as comment_sequence
+          SELECT ticket_comment.ticket_id, ticket_comment.created, row_number() over (partition by ticket_comment.ticket_id order by ticket_comment.created asc) as comment_sequence
           FROM zendesk.ticket_comment
       ) tc on tc.ticket_id = tfh.ticket_id and tc.comment_sequence = 2
-      GROUP BY ticket_id, tc.created ;;
+      GROUP BY tfh.ticket_id, tc.created ;;
   }
 
   dimension_group: first_response {
@@ -958,7 +958,7 @@ view: ticket_history_facts {
 
   dimension: number_of_assignee_changes {
     type: number
-    sql: ${TABLE}.number_of_assignee_changes ;;
+    sql: ${TABLE}.number_of_assignee_changes*1.0 ;;
     description: "Number of times the assignee changed for a ticket (including initial assignemnt)"
   }
 
@@ -1044,14 +1044,14 @@ view: number_of_reopens {
          statuses AS (
             SELECT
                 ticket_id,
-                LAG(ticket_id, 1, 0) OVER(ORDER BY ticket_id, updated) AS prev_ticket_id,
+                LAG(ticket_id, 1) OVER(ORDER BY ticket_id, updated) AS prev_ticket_id,
                 value AS status,
-                LAG(value, 1, 'new') OVER(ORDER BY ticket_id, updated) AS prev_status
+                LAG(value, 1) OVER(ORDER BY ticket_id, updated) AS prev_status
             FROM grouped_ticket_status_history
          )
          SELECT
              DISTINCT ticket_id,
-             COUNT(ticket_id) AS number_of_reopens
+             COUNT(ticket_id)*1.0 AS number_of_reopens
          FROM statuses
          WHERE ticket_id = prev_ticket_id AND prev_status = 'solved' AND status = 'open'
          GROUP BY ticket_id ;;
@@ -1066,7 +1066,7 @@ view: number_of_reopens {
 
   dimension: number_of_reopens {
     type: number
-    sql: ${TABLE}.number_of_reopens ;;
+    sql: ${TABLE}.number_of_reopens*1.00 ;;
     description: "Number of times the ticket was reopened"
   }
 
@@ -1100,7 +1100,7 @@ view: ticket_assignee_facts {
         , count(*) as lifetime_tickets
         , min(created_at) as first_ticket
         , max(created_at) as latest_ticket
-        , 1.0 * COUNT(*) / NULLIF(DATE_DIFF(CURRENT_DATE, MIN(EXTRACT(date from created_at)), day), 0) AS avg_tickets_per_day
+        , 1.0 * COUNT(*) / NULLIF(DATE_DIFF('DAY', CURRENT_DATE, MIN(EXTRACT(date from created_at))), 0) AS avg_tickets_per_day
       FROM zendesk.ticket
       GROUP BY 1
        ;;
