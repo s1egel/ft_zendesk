@@ -52,14 +52,10 @@
     model: zendesk_block
     explore: ticket
     type: looker_column
-    fields:
-    - ticket.count
-    - organization.name
-    filters:
-      organization.name: "-NULL"
-    sorts:
-    - ticket.count desc
+    fields: [ticket.count, requester.name]
+    sorts: [ticket.count desc]
     limit: 10
+    column_limit: 50
     query_timezone: America/Los_Angeles
     stacking: ''
     show_value_labels: true
@@ -83,8 +79,7 @@
     show_totals_labels: false
     show_silhouette: false
     totals_color: "#808080"
-    colors:
-    - 'palette: Mixed Dark'
+    colors: ['palette: Mixed Dark']
     series_colors: {}
     show_dropoff: false
     listen:
