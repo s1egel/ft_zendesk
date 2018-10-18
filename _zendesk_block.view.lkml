@@ -201,7 +201,7 @@ view: ticket {
 
   dimension: days_since_updated {
     type: number
-    sql: 1.00 * DATE_DIFF('DAY',${last_updated_date}, CURRENT_DATE)  ;;
+    sql: 1.00 * DATE_DIFF('DAY',${last_updated_date}, ${_CURRENT_DATE})  ;;
     html: {% if value > 60 %}
             <div style="color: white; background-color: darkred; font-size:100%; text-align:center">{{ rendered_value }}</div>
           {% else %}

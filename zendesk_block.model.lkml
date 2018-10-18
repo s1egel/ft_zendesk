@@ -2,7 +2,7 @@ connection: "convow_dw"
 
 include: "*_zendesk_block.view"
 include: "*_zendesk_variables.view"
-include: "*.dashboard"
+# include: "*.dashboard"
 
 explore: ticket {
   join: assignee {

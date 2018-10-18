@@ -13,7 +13,7 @@ view: _variables {
   dimension: _ZENDESK_INSTANCE_DOMAIN {
     type: string
     hidden: yes
-    sql: 'looker' ;;
+    sql: 'convoy' ;;
   }
 
 # Name of your company Looker instance (i.e. company_name.looker.com)
@@ -21,7 +21,7 @@ view: _variables {
   dimension: _LOOKER_INSTANCE_DOMAIN {
     type: string
     hidden: yes
-    sql: 'fivetrandemo' ;;
+    sql: 'convoy' ;;
   }
 
 # Once you convert the Dashboard from LookML, the ID of the Zendesk Ticket Detail Dashboard
@@ -29,7 +29,7 @@ view: _variables {
   dimension: _ZENDESK_TICKET_DETAIL_DASHBOARD_ID {
     type: number
     hidden: yes
-    sql: 6 ;;
+    sql: 9 ;;
   }
 
 # Once you convert the Dashboard from LookML, the ID of the Zendesk Ticket Detail Dashboard
