@@ -1,4 +1,4 @@
-connection: "convow_dw"
+connection: "convoy_snowflake"
 
 include: "*_zendesk_block.view"
 include: "*_zendesk_variables.view"

@@ -176,22 +176,22 @@ view: ticket {
 
   dimension: days_to_solve {
     type: number
-    sql: 1.00 * DATE_DIFF('DAY', ${created_date}, ${ticket_history_facts.solved_date}) ;;
+    sql: 1.00 * DATEDIFF('DAY', ${created_date}, ${ticket_history_facts.solved_date}) ;;
   }
 
   dimension: days_to_first_response {
     type: number
-    sql: 1.00 * DATE_DIFF('DAY', ${created_date}, ${ticket_history_facts.first_response_date}) ;;
+    sql: 1.00 * DATEDIFF('DAY', ${created_date}, ${ticket_history_facts.first_response_date}) ;;
   }
 
   dimension: minutes_to_first_response {
     type: number
-    sql: 1.00 * DATE_DIFF('MINUTE', ${created_raw}, ${ticket_history_facts.first_response_raw}) ;;
+    sql: 1.00 * DATEDIFF('MINUTE', ${created_raw}, ${ticket_history_facts.first_response_raw}) ;;
   }
 
   dimension: hours_to_solve {
     type: number
-    sql: 1.00 * DATE_DIFF('HOUR', ${created_raw}, ${ticket_history_facts.solved_raw}) ;;
+    sql: 1.00 * DATEDIFF('HOUR', ${created_raw}, ${ticket_history_facts.solved_raw}) ;;
   }
 
   dimension: is_responded_to {
@@ -201,7 +201,7 @@ view: ticket {
 
   dimension: days_since_updated {
     type: number
-    sql: 1.00 * DATE_DIFF('DAY',${last_updated_date}, ${_CURRENT_DATE})  ;;
+    sql: 1.00 * DATEDIFF('DAY',${last_updated_date}, ${_CURRENT_DATE})  ;;
     html: {% if value > 60 %}
             <div style="color: white; background-color: darkred; font-size:100%; text-align:center">{{ rendered_value }}</div>
           {% else %}
@@ -1100,7 +1100,7 @@ view: ticket_assignee_facts {
         , count(*) as lifetime_tickets
         , min(created_at) as first_ticket
         , max(created_at) as latest_ticket
-        , 1.0 * COUNT(*) / NULLIF(DATE_DIFF('DAY', CURRENT_DATE, MIN(EXTRACT(date from created_at))), 0) AS avg_tickets_per_day
+        , 1.0 * COUNT(*) / NULLIF(DATEDIFF('DAY', CURRENT_DATE, MIN(EXTRACT(date from created_at))), 0) AS avg_tickets_per_day
       FROM zendesk.ticket
       GROUP BY 1
        ;;
